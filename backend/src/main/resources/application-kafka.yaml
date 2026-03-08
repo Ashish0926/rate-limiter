@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        linger:
+          ms: 100
+
+    consumer:
+      enable-auto-commit: true
+      group-id: rate-limiter
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        allow:
+          auto:
+            create:
+              topics: false
+        spring:
+          deserializer:
+            value:
+              delegate:
+                class: org.apache.kafka.common.serialization.StringDeserializer
+            key:
+              delegate:
+                class: org.apache.kafka.common.serialization.StringDeserializer
+            json:
+              trusted:
+                packages: com.ashish.*
+              type:
+                mapping:
+                  - 'com.ashish.ratelimiterservice.messaging.event.ApiRequestEvent: com.ashish.ratelimiterservice.messaging.event.ApiRequestEvent'
